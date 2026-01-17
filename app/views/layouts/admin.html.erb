@@ -31,6 +31,9 @@
               <%= link_to "Events", admin_events_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
               <%= link_to "Applications", admin_visa_letter_applications_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
               <%= link_to "Templates", admin_letter_templates_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
+              <% if current_admin.super_admin? %>
+                <%= link_to "Admins", admin_admins_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
+              <% end %>
             </div>
           </div>
           <div class="flex items-center space-x-4">

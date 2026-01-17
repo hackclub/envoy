@@ -1,0 +1,10 @@
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <%= link_to "← Back to Admins", admin_admins_path, class: "text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit Admin</h1>
+    <%= render "form", admin: @admin %>
+  </div>
+</div>

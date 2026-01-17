@@ -47,6 +47,7 @@ Rails.application.routes.draw do
         post :set_default
       end
     end
+    resources :admins
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

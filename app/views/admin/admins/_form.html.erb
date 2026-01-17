@@ -1,0 +1,67 @@
+<%= form_with model: [:admin, admin], class: "space-y-6" do |f| %>
+  <% if admin.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <h3 class="font-medium">Please fix the following errors:</h3>
+      <ul class="list-disc list-inside mt-2">
+        <% admin.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= f.label :first_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :first_name, required: true,
+          class: "w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div>
+      <%= f.label :last_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :last_name, required: true,
+          class: "w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.email_field :email, required: true,
+        class: "w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.password_field :password, autocomplete: "new-password",
+          required: admin.new_record?,
+          class: "w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500" %>
+      <% unless admin.new_record? %>
+        <p class="text-xs text-gray-500 mt-1">Leave blank to keep current password</p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password",
+          required: admin.new_record?,
+          class: "w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+  </div>
+
+  <% if current_admin.super_admin? && admin != current_admin %>
+    <div class="flex items-center">
+      <%= f.check_box :super_admin, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= f.label :super_admin, class: "ml-2 block text-sm text-gray-700" do %>
+        <span class="font-medium">Super Admin</span>
+        <span class="text-gray-500">— can manage all events, admins, and global templates</span>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex justify-end space-x-3 pt-4 border-t">
+    <%= link_to "Cancel", admin_admins_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" %>
+    <%= f.submit admin.new_record? ? "Create Admin" : "Update Admin",
+        class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer" %>
+  </div>
+<% end %>

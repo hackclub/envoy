@@ -1,0 +1,53 @@
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <%= link_to "← Back to Admins", admin_admins_path, class: "text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900"><%= @admin.full_name %></h1>
+        <p class="text-gray-500"><%= @admin.email %></p>
+      </div>
+      <% if @admin.super_admin? %>
+        <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800">Super Admin</span>
+      <% else %>
+        <span class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-800">Admin</span>
+      <% end %>
+    </div>
+
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <dt class="font-medium text-gray-500">Events Created</dt>
+        <dd class="mt-1 text-gray-900"><%= @admin.events.count %></dd>
+      </div>
+      <div>
+        <dt class="font-medium text-gray-500">Applications Reviewed</dt>
+        <dd class="mt-1 text-gray-900"><%= @admin.reviewed_applications.count %></dd>
+      </div>
+      <div>
+        <dt class="font-medium text-gray-500">Last Sign In</dt>
+        <dd class="mt-1 text-gray-900">
+          <% if @admin.last_sign_in_at %>
+            <%= @admin.last_sign_in_at.strftime("%B %d, %Y at %I:%M %p") %>
+          <% else %>
+            Never
+          <% end %>
+        </dd>
+      </div>
+      <div>
+        <dt class="font-medium text-gray-500">Account Created</dt>
+        <dd class="mt-1 text-gray-900"><%= @admin.created_at.strftime("%B %d, %Y") %></dd>
+      </div>
+    </dl>
+
+    <div class="mt-6 pt-6 border-t flex space-x-3">
+      <%= link_to "Edit", edit_admin_admin_path(@admin), class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+      <% if policy(@admin).destroy? %>
+        <%= button_to "Delete", admin_admin_path(@admin), method: :delete,
+            data: { turbo_confirm: "Are you sure you want to delete #{@admin.full_name}?" },
+            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
+      <% end %>
+    </div>
+  </div>
+</div>

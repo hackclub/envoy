@@ -14,7 +14,7 @@ class VerificationsController < ApplicationController
       render :pending
     else
       flash.now[:alert] = "Invalid verification code. Please check and try again."
-      render :show
+      render :show, status: :unprocessable_entity
     end
   end
 end
