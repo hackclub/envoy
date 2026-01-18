@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "rubocoppin..."
+bin/rubocop
+
+echo ""
+echo "brakemanin..."
+bin/brakeman --no-pager

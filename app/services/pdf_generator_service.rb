@@ -23,7 +23,7 @@ class PdfGeneratorService
     doc.encrypt(
       user_password: "",
       owner_password: SecureRandom.hex(32),
-      permissions: [:copy_content, :print, :high_quality_print],
+      permissions: [ :copy_content, :print, :high_quality_print ],
       algorithm: :aes,
       key_length: 128
     )
