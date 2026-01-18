@@ -118,6 +118,7 @@ GEM
     childprocess (5.1.0)
       logger (~> 1.5)
     chunky_png (1.4.0)
+    cmdparse (3.0.7)
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
     crass (1.0.6)
@@ -151,12 +152,18 @@ GEM
     ffi (1.17.3-arm64-darwin)
     ffi (1.17.3-x86_64-darwin)
     ffi (1.17.3-x86_64-linux-gnu)
+    geom2d (0.4.1)
     globalid (1.3.0)
       activesupport (>= 6.1)
     grover (1.2.6)
       nokogiri (~> 1)
     hashie (5.1.0)
       logger
+    hexapdf (1.5.0)
+      cmdparse (~> 3.0, >= 3.0.3)
+      geom2d (~> 0.4, >= 0.4.1)
+      openssl (>= 2.2.1)
+      strscan (>= 3.1.2)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -243,6 +250,7 @@ GEM
     omniauth-rails_csrf_protection (2.0.1)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
+    openssl (4.0.0)
     orm_adapter (0.5.0)
     parallel (1.27.0)
     parser (3.3.10.1)
@@ -411,6 +419,7 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.2.0)
+    strscan (3.1.7)
     tailwindcss-rails (4.4.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
@@ -462,6 +471,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   grover
+  hexapdf
   image_processing (~> 1.2)
   jbuilder
   jsbundling-rails

@@ -14,7 +14,22 @@ class PdfGeneratorService
   private
 
   def generate_pdf(html)
-    Grover.new(html, **pdf_options).to_pdf
+    pdf_content = Grover.new(html, **pdf_options).to_pdf
+    lock_pdf(pdf_content)
+  end
+
+  def lock_pdf(pdf_content)
+    doc = HexaPDF::Document.new(io: StringIO.new(pdf_content))
+    doc.encrypt(
+      user_password: "",
+      owner_password: SecureRandom.hex(32),
+      permissions: [:copy_content, :print, :high_quality_print],
+      algorithm: :aes,
+      key_length: 128
+    )
+    output = StringIO.new
+    doc.write(output)
+    output.string
   end
 
   def pdf_options

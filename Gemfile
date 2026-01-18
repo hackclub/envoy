@@ -34,6 +34,7 @@ gem "aws-sdk-s3", require: false
 
 # PDF Generation
 gem "grover"
+gem "hexapdf"
 
 # QR Code Generation
 gem "rqrcode"
