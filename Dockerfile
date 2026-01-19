@@ -65,6 +65,10 @@ RUN rm -rf node_modules
 # Final stage for app image
 FROM base
 
+# Copy Node.js from build stage (needed by Grover for PDF generation)
+COPY --from=build /usr/local/node /usr/local/node
+ENV PATH=/usr/local/node/bin:$PATH
+
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
