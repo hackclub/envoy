@@ -59,17 +59,40 @@ RUN bundle exec bootsnap precompile app/ lib/
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
-RUN rm -rf node_modules
-
-
 # Final stage for app image
 FROM base
+
+# Install Chromium and dependencies required by Puppeteer for PDF generation
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    chromium \
+    fonts-liberation \
+    libasound2t64 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Tell Puppeteer to use system Chromium instead of downloading its own
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Copy Node.js from build stage (needed by Grover for PDF generation)
 COPY --from=build /usr/local/node /usr/local/node
 ENV PATH=/usr/local/node/bin:$PATH
 
-# Copy built artifacts: gems, application
+# Copy built artifacts: gems, application, and node_modules (for puppeteer)
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 

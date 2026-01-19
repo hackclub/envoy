@@ -12,6 +12,7 @@ Grover.configure do |config|
     emulate_media: "print",
     wait_until: "networkidle0",
     timeout: 30_000,
-    launch_args: [ "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" ]
+    launch_args: [ "--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage" ],
+    executable_path: ENV.fetch("PUPPETEER_EXECUTABLE_PATH", nil)
   }
 end
