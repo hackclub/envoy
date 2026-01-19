@@ -1,7 +1,7 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-  authenticate :admin do
+  authenticate :admin, ->(admin) { admin.super_admin? } do
     mount Sidekiq::Web => "/admin/sidekiq"
   end
 
