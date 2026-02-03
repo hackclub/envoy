@@ -19,6 +19,10 @@ class VisaLetterApplicationPolicy < ApplicationPolicy
     user.present? && (record.approved? || record.letter_sent?)
   end
 
+  def downgrade_rejection?
+    user.present? && record.hard_rejected?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       if user&.super_admin?

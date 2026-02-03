@@ -11,7 +11,14 @@ Reason
 <%= @application.rejection_reason %>
 <% end %>
 
-If you believe this decision was made in error or if you have additional information to provide, please contact us at <%= @event.contact_email %>.
+<% if @can_reapply %>
+You Can Reapply
+If you have addressed the issues mentioned above or have additional information to provide, you are welcome to submit a new application.
+
+Reapply here: <%= @reapply_url %>
+<% else %>
+If you believe this decision was made in error, please contact us at <%= @event.contact_email %>.
+<% end %>
 
 We appreciate your understanding.
 

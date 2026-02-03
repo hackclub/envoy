@@ -13,9 +13,12 @@ class VisaLetterApplication < ApplicationRecord
     letter_sent
   ].freeze
 
+  REJECTION_TYPES = %w[soft hard].freeze
+
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :reference_number, presence: true, uniqueness: true
   validates :rejection_reason, presence: true, if: -> { status == "rejected" }
+  validates :rejection_type, presence: true, inclusion: { in: REJECTION_TYPES }, if: -> { status == "rejected" }
   validates :participant_id, uniqueness: { scope: :event_id, message: "already has an application for this event" }
 
   before_validation :generate_reference_number, on: :create
@@ -26,6 +29,16 @@ class VisaLetterApplication < ApplicationRecord
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
   scope :letter_sent, -> { where(status: "letter_sent") }
+  scope :hard_rejected, -> { rejected.where(rejection_type: "hard") }
+  scope :soft_rejected, -> { rejected.where(rejection_type: "soft") }
+
+  def self.email_hard_rejected_for_event?(email, event)
+    joins(:participant)
+      .where(participants: { email: email.to_s.strip.downcase })
+      .where(event: event)
+      .hard_rejected
+      .exists?
+  end
 
   def pending_verification?
     status == "pending_verification"
@@ -41,6 +54,14 @@ class VisaLetterApplication < ApplicationRecord
 
   def rejected?
     status == "rejected"
+  end
+
+  def hard_rejected?
+    rejected? && rejection_type == "hard"
+  end
+
+  def soft_rejected?
+    rejected? && rejection_type == "soft"
   end
 
   def letter_sent?
@@ -66,7 +87,7 @@ class VisaLetterApplication < ApplicationRecord
     true
   end
 
-  def reject!(admin, reason:, notes: nil)
+  def reject!(admin, reason:, rejection_type:, notes: nil)
     return false unless pending_approval?
 
     update!(
@@ -74,9 +95,21 @@ class VisaLetterApplication < ApplicationRecord
       reviewed_by: admin,
       reviewed_at: Time.current,
       rejection_reason: reason,
+      rejection_type: rejection_type,
       admin_notes: notes
     )
     true
+  end
+
+  def downgrade_to_soft_reject!(admin)
+    return false unless hard_rejected?
+
+    update!(rejection_type: "soft")
+    true
+  end
+
+  def can_reapply?
+    soft_rejected?
   end
 
   def mark_letter_generated!

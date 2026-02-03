@@ -23,8 +23,19 @@ FactoryBot.define do
       submitted_at { 3.days.ago }
       reviewed_at { 1.day.ago }
       rejection_reason { "Incomplete documentation" }
+      rejection_type { "soft" }
       association :reviewed_by, factory: :admin
       participant { association :participant, :verified }
+    end
+
+    trait :soft_rejected do
+      rejected
+      rejection_type { "soft" }
+    end
+
+    trait :hard_rejected do
+      rejected
+      rejection_type { "hard" }
     end
 
     trait :letter_sent do

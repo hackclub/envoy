@@ -18,6 +18,14 @@ class VisaLetterApplicationsController < ApplicationController
     end
 
     email = participant_params[:email].to_s.strip.downcase
+
+    if VisaLetterApplication.email_hard_rejected_for_event?(email, @event)
+      @participant = Participant.new(participant_params)
+      flash.now[:alert] = "This email address is not eligible to apply for this event. If you believe this is an error, please contact #{@event.contact_email}."
+      render :new, status: :unprocessable_entity
+      return
+    end
+
     existing_participant = Participant.find_by(email: email)
 
     if existing_participant
@@ -30,7 +38,7 @@ class VisaLetterApplicationsController < ApplicationController
         return
       end
 
-      existing_application&.destroy if existing_application&.rejected?
+      existing_application&.destroy if existing_application&.soft_rejected?
     end
 
     @participant = existing_participant || Participant.new

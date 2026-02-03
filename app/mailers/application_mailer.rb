@@ -42,10 +42,24 @@ class ApplicationMailer < ActionMailer::Base
     @application = application
     @participant = application.participant
     @event = application.event
+    @can_reapply = application.soft_rejected?
+    @reapply_url = new_event_application_url(@event.slug) if @can_reapply
 
     mail(
       to: @participant.email,
       subject: "Update on Your Visa Letter Application - #{@event.name}"
+    )
+  end
+
+  def rejection_downgraded(application)
+    @application = application
+    @participant = application.participant
+    @event = application.event
+    @reapply_url = new_event_application_url(@event.slug)
+
+    mail(
+      to: @participant.email,
+      subject: "You Can Now Reapply for Your Visa Letter - #{@event.name}"
     )
   end
 end

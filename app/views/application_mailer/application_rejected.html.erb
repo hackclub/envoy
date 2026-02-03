@@ -11,7 +11,13 @@
 <p><%= @application.rejection_reason %></p>
 <% end %>
 
-<p>If you believe this decision was made in error or if you have additional information to provide, please contact us at <%= @event.contact_email %>.</p>
+<% if @can_reapply %>
+<h2>You Can Reapply</h2>
+<p>If you have addressed the issues mentioned above or have additional information to provide, you are welcome to submit a new application.</p>
+<p><a href="<%= @reapply_url %>" style="display: inline-block; background-color: #ec3750; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Reapply Now</a></p>
+<% else %>
+<p>If you believe this decision was made in error, please contact us at <%= @event.contact_email %>.</p>
+<% end %>
 
 <p>We appreciate your understanding.</p>
 

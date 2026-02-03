@@ -56,6 +56,7 @@ Rails.application.routes.draw do
         post :approve
         post :reject
         post :regenerate_letter
+        post :downgrade_rejection
       end
     end
     resources :letter_templates do

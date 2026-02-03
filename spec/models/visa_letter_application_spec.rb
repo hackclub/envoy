@@ -20,9 +20,21 @@ RSpec.describe VisaLetterApplication, type: :model do
     end
 
     it "requires rejection_reason when status is rejected" do
-      application = build(:visa_letter_application, status: "rejected", rejection_reason: nil)
+      application = build(:visa_letter_application, status: "rejected", rejection_reason: nil, rejection_type: "soft")
       expect(application).not_to be_valid
       expect(application.errors[:rejection_reason]).to be_present
+    end
+
+    it "requires rejection_type when status is rejected" do
+      application = build(:visa_letter_application, status: "rejected", rejection_reason: "Test", rejection_type: nil)
+      expect(application).not_to be_valid
+      expect(application.errors[:rejection_type]).to be_present
+    end
+
+    it "validates rejection_type is in allowed values" do
+      application = build(:visa_letter_application, status: "rejected", rejection_reason: "Test", rejection_type: "invalid")
+      expect(application).not_to be_valid
+      expect(application.errors[:rejection_type]).to be_present
     end
   end
 
@@ -79,18 +91,70 @@ RSpec.describe VisaLetterApplication, type: :model do
     let(:admin) { create(:admin) }
     let(:application) { create(:visa_letter_application, :pending_approval) }
 
-    it "updates status to rejected with reason" do
-      result = application.reject!(admin, reason: "Missing documents", notes: "Please resubmit")
+    it "updates status to rejected with reason and soft rejection type" do
+      result = application.reject!(admin, reason: "Missing documents", rejection_type: "soft", notes: "Please resubmit")
       expect(result).to be true
       expect(application.status).to eq("rejected")
       expect(application.rejection_reason).to eq("Missing documents")
+      expect(application.rejection_type).to eq("soft")
       expect(application.admin_notes).to eq("Please resubmit")
+      expect(application.soft_rejected?).to be true
+    end
+
+    it "updates status to rejected with hard rejection type" do
+      result = application.reject!(admin, reason: "Fraud", rejection_type: "hard")
+      expect(result).to be true
+      expect(application.rejection_type).to eq("hard")
+      expect(application.hard_rejected?).to be true
     end
 
     it "returns false if not pending_approval" do
       application.update!(status: "approved")
-      result = application.reject!(admin, reason: "Test")
+      result = application.reject!(admin, reason: "Test", rejection_type: "soft")
       expect(result).to be false
+    end
+  end
+
+  describe "#downgrade_to_soft_reject!" do
+    let(:admin) { create(:admin) }
+
+    it "changes hard reject to soft reject" do
+      application = create(:visa_letter_application, :hard_rejected)
+      result = application.downgrade_to_soft_reject!(admin)
+      expect(result).to be true
+      expect(application.rejection_type).to eq("soft")
+      expect(application.soft_rejected?).to be true
+    end
+
+    it "returns false if not hard rejected" do
+      application = create(:visa_letter_application, :soft_rejected)
+      result = application.downgrade_to_soft_reject!(admin)
+      expect(result).to be false
+    end
+  end
+
+  describe ".email_hard_rejected_for_event?" do
+    let(:event) { create(:event) }
+    let(:participant) { create(:participant, :verified, email: "test@example.com") }
+
+    it "returns true for hard-rejected email" do
+      create(:visa_letter_application, :hard_rejected, participant: participant, event: event)
+      expect(VisaLetterApplication.email_hard_rejected_for_event?("test@example.com", event)).to be true
+    end
+
+    it "returns false for soft-rejected email" do
+      create(:visa_letter_application, :soft_rejected, participant: participant, event: event)
+      expect(VisaLetterApplication.email_hard_rejected_for_event?("test@example.com", event)).to be false
+    end
+
+    it "returns false for non-rejected email" do
+      create(:visa_letter_application, :approved, participant: participant, event: event)
+      expect(VisaLetterApplication.email_hard_rejected_for_event?("test@example.com", event)).to be false
+    end
+
+    it "handles case-insensitive email lookup" do
+      create(:visa_letter_application, :hard_rejected, participant: participant, event: event)
+      expect(VisaLetterApplication.email_hard_rejected_for_event?("TEST@EXAMPLE.COM", event)).to be true
     end
   end
 

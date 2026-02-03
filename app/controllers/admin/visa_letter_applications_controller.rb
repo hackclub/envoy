@@ -1,5 +1,5 @@
 class Admin::VisaLetterApplicationsController < Admin::BaseController
-    before_action :set_application, only: [ :show, :approve, :reject, :regenerate_letter ]
+    before_action :set_application, only: [ :show, :approve, :reject, :regenerate_letter, :downgrade_rejection ]
 
     def index
       @applications = policy_scope(VisaLetterApplication)
@@ -55,17 +55,40 @@ class Admin::VisaLetterApplicationsController < Admin::BaseController
         return
       end
 
+      rejection_type = params[:rejection_type].presence || "soft"
+      unless VisaLetterApplication::REJECTION_TYPES.include?(rejection_type)
+        redirect_to admin_visa_letter_application_path(@application),
+                    alert: "Invalid rejection type."
+        return
+      end
+
       result = ApplicationApprovalService.new(@application, current_admin).reject!(
         reason: params[:rejection_reason],
+        rejection_type: rejection_type,
         notes: params[:admin_notes]
       )
 
+      rejection_label = rejection_type == "hard" ? "permanently rejected" : "rejected (can reapply)"
       if result[:success]
         redirect_to admin_visa_letter_application_path(@application),
-                    notice: "Application rejected. The applicant will be notified."
+                    notice: "Application #{rejection_label}. The applicant will be notified."
       else
         redirect_to admin_visa_letter_application_path(@application),
                     alert: "Failed to reject application: #{result[:error]}"
+      end
+    end
+
+    def downgrade_rejection
+      authorize @application
+
+      result = ApplicationApprovalService.new(@application, current_admin).downgrade_to_soft_reject!
+
+      if result[:success]
+        redirect_to admin_visa_letter_application_path(@application),
+                    notice: "Rejection downgraded. The applicant can now reapply and will be notified."
+      else
+        redirect_to admin_visa_letter_application_path(@application),
+                    alert: "Failed to downgrade rejection: #{result[:error]}"
       end
     end
 
