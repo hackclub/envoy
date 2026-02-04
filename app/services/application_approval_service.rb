@@ -16,9 +16,9 @@ class ApplicationApprovalService
         admin: @admin,
         metadata: { notes: notes }
       )
-
-      GenerateAndSendLetterJob.perform_later(@application.id)
     end
+
+    GenerateAndSendLetterJob.perform_later(@application.id)
 
     { success: true }
   rescue StandardError => e
@@ -38,9 +38,9 @@ class ApplicationApprovalService
         admin: @admin,
         metadata: { reason: reason, rejection_type: rejection_type, notes: notes }
       )
-
-      SendRejectionNotificationJob.perform_later(@application.id)
     end
+
+    SendRejectionNotificationJob.perform_later(@application.id)
 
     { success: true }
   rescue StandardError => e
@@ -60,9 +60,9 @@ class ApplicationApprovalService
         admin: @admin,
         metadata: {}
       )
-
-      SendRejectionDowngradeNotificationJob.perform_later(@application.id)
     end
+
+    SendRejectionDowngradeNotificationJob.perform_later(@application.id)
 
     { success: true }
   rescue StandardError => e
