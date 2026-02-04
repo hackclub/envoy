@@ -50,6 +50,8 @@ Rails.application.routes.draw do
   namespace :admin do
     get "/", to: "dashboard#index", as: :dashboard
 
+    resource :settings, only: [ :show, :update ]
+
     resources :events
     resources :visa_letter_applications, only: [ :index, :show ] do
       member do

@@ -79,7 +79,7 @@ class Admin::AdminsController < Admin::BaseController
   end
 
   def admin_params
-    permitted = [ :first_name, :last_name, :email ]
+    permitted = [ :first_name, :last_name, :email, :notify_new_applications ]
     permitted << :super_admin if current_admin.super_admin?
     params.require(:admin).permit(permitted)
   end

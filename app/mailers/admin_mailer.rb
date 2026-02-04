@@ -7,9 +7,20 @@ class AdminMailer < ActionMailer::Base
     @participant = application.participant
     @event = application.event
 
-    recipients = [ @event.contact_email ]
-    recipients += Admin.where(super_admin: true).pluck(:email)
+    recipients = []
+
+    # Add event owner if they want notifications
+    event_owner = @event.admin
+    if event_owner.notify_new_applications?
+      recipients << event_owner.email
+    end
+
+    # Add super admins who want notifications
+    recipients += Admin.where(super_admin: true, notify_new_applications: true).pluck(:email)
+
     recipients = recipients.uniq.compact
+
+    return if recipients.empty?
 
     mail(
       to: recipients,

@@ -43,6 +43,7 @@
                 <span class="bg-yellow-500 text-yellow-900 text-xs px-2 py-1 rounded ml-1 font-semibold">Super Admin</span>
               <% end %>
             </span>
+            <%= link_to "Settings", admin_settings_path, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
             <%= link_to "View Site", root_path, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
             <%= button_to "Sign Out", destroy_admin_session_path, method: :delete, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
           </div>
