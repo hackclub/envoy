@@ -1,4 +1,6 @@
 class Admin::SettingsController < Admin::BaseController
+  skip_after_action :verify_authorized
+
   def show
     @admin = current_admin
   end
