@@ -95,3 +95,14 @@
     </div>
   </dl>
 </div>
+
+<% if @event.rejection_reason_templates_list.any? %>
+<div class="mt-8 bg-white rounded-lg shadow p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Rejection Reason Templates</h3>
+  <ul class="space-y-2">
+    <% @event.rejection_reason_templates_list.each do |template| %>
+      <li class="bg-gray-50 px-3 py-2 rounded-md text-sm text-gray-700"><%= template %></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>

@@ -80,9 +80,14 @@ class Admin::EventsController < Admin::BaseController
       permitted = [
         :name, :slug, :description, :venue_name, :venue_address,
         :city, :country, :start_date, :end_date, :application_deadline,
-        :contact_email, :active, :applications_open
+        :contact_email, :active, :applications_open,
+        rejection_reason_templates: []
       ]
       permitted << :admin_id if current_admin.super_admin?
-      params.require(:event).permit(permitted)
+      result = params.require(:event).permit(permitted)
+      if result[:rejection_reason_templates].present?
+        result[:rejection_reason_templates] = result[:rejection_reason_templates].reject(&:blank?)
+      end
+      result
     end
 end

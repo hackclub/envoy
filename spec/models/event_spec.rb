@@ -105,4 +105,51 @@ RSpec.describe Event, type: :model do
       expect(event.slug).to eq("my-cool-event")
     end
   end
+
+  describe "rejection_reason_templates" do
+    it "defaults to empty array" do
+      event = create(:event)
+      expect(event.rejection_reason_templates).to eq([])
+    end
+
+    it "stores and retrieves templates" do
+      event = create(:event, rejection_reason_templates: [ "Missing documents", "Invalid passport" ])
+      expect(event.rejection_reason_templates_list).to eq([ "Missing documents", "Invalid passport" ])
+    end
+
+    it "validates templates must be array of strings" do
+      event = build(:event, rejection_reason_templates: "not an array")
+      expect(event).not_to be_valid
+      expect(event.errors[:rejection_reason_templates]).to be_present
+    end
+
+    describe "#add_rejection_reason_template" do
+      it "adds a new template" do
+        event = create(:event)
+        event.add_rejection_reason_template("New reason")
+        expect(event.rejection_reason_templates_list).to include("New reason")
+      end
+
+      it "does not add duplicate templates" do
+        event = create(:event, rejection_reason_templates: [ "Existing reason" ])
+        result = event.add_rejection_reason_template("Existing reason")
+        expect(result).to be false
+        expect(event.rejection_reason_templates_list.count).to eq(1)
+      end
+
+      it "does not add blank templates" do
+        event = create(:event)
+        result = event.add_rejection_reason_template("")
+        expect(result).to be false
+      end
+    end
+
+    describe "#remove_rejection_reason_template" do
+      it "removes an existing template" do
+        event = create(:event, rejection_reason_templates: [ "Reason 1", "Reason 2" ])
+        event.remove_rejection_reason_template("Reason 1")
+        expect(event.rejection_reason_templates_list).to eq([ "Reason 2" ])
+      end
+    end
+  end
 end

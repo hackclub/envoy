@@ -6,3 +6,9 @@ import { application } from "./application"
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import RejectionTemplatesController from "./rejection_templates_controller"
+application.register("rejection-templates", RejectionTemplatesController)
+
+import RejectionReasonController from "./rejection_reason_controller"
+application.register("rejection-reason", RejectionReasonController)

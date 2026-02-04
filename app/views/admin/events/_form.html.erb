@@ -98,6 +98,43 @@
     </div>
   </div>
 
+  <div class="border-t pt-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Rejection Reason Templates</h3>
+    <p class="text-sm text-gray-500 mb-4">Add pre-set rejection reasons that admins can quickly select when rejecting applications for this event.</p>
+    
+    <div id="rejection-templates-container" data-controller="rejection-templates">
+      <div class="space-y-2 mb-4" data-rejection-templates-target="list">
+        <% event.rejection_reason_templates_list.each_with_index do |template, index| %>
+          <div class="flex items-center gap-2" data-rejection-templates-target="item">
+            <%= hidden_field_tag "event[rejection_reason_templates][]", template %>
+            <span class="flex-1 bg-gray-50 px-3 py-2 rounded-md text-sm text-gray-700"><%= template %></span>
+            <button type="button" 
+                    data-action="rejection-templates#remove"
+                    class="text-red-600 hover:text-red-800 text-sm font-medium">
+              Remove
+            </button>
+          </div>
+        <% end %>
+      </div>
+      
+      <% if event.rejection_reason_templates_list.empty? %>
+        <%= hidden_field_tag "event[rejection_reason_templates][]", "", id: "empty-templates-placeholder" %>
+      <% end %>
+      
+      <div class="flex gap-2">
+        <input type="text" 
+               data-rejection-templates-target="input"
+               placeholder="Enter a rejection reason template..."
+               class="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 text-sm">
+        <button type="button" 
+                data-action="rejection-templates#add"
+                class="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 text-sm">
+          Add Template
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="flex justify-end space-x-4 pt-4">
     <%= link_to "Cancel", admin_events_path, class: "py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50" %>
     <%= f.submit event.persisted? ? "Update Event" : "Create Event", class: "bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 cursor-pointer" %>
