@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_18_011055) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_03_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -69,6 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_18_011055) do
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
     t.datetime "locked_at"
+    t.boolean "notify_new_applications", default: true, null: false
     t.string "provider"
     t.datetime "remember_created_at"
     t.string "remember_token"
@@ -95,6 +96,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_18_011055) do
     t.text "description"
     t.date "end_date", null: false
     t.string "name", null: false
+    t.jsonb "rejection_reason_templates", default: [], null: false
     t.string "slug", null: false
     t.date "start_date", null: false
     t.datetime "updated_at", null: false
@@ -149,6 +151,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_18_011055) do
     t.uuid "participant_id", null: false
     t.string "reference_number", null: false
     t.text "rejection_reason"
+    t.string "rejection_type"
     t.datetime "reviewed_at"
     t.uuid "reviewed_by_id"
     t.string "status", default: "pending_verification", null: false
@@ -159,6 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_18_011055) do
     t.index ["participant_id", "event_id"], name: "index_visa_letter_applications_on_participant_id_and_event_id", unique: true
     t.index ["participant_id"], name: "index_visa_letter_applications_on_participant_id"
     t.index ["reference_number"], name: "index_visa_letter_applications_on_reference_number", unique: true
+    t.index ["rejection_type"], name: "index_visa_letter_applications_on_rejection_type"
     t.index ["reviewed_by_id"], name: "index_visa_letter_applications_on_reviewed_by_id"
     t.index ["status"], name: "index_visa_letter_applications_on_status"
     t.index ["submitted_at"], name: "index_visa_letter_applications_on_submitted_at"

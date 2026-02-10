@@ -23,6 +23,8 @@ gem "omniauth-hack_club"
 gem "omniauth-rails_csrf_protection"
 gem "pundit"
 
+gem "appsignal"
+
 # Background Jobs
 gem "sidekiq"
 
