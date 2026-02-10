@@ -12,3 +12,6 @@ application.register("rejection-templates", RejectionTemplatesController)
 
 import RejectionReasonController from "./rejection_reason_controller"
 application.register("rejection-reason", RejectionReasonController)
+
+import MobileNavController from "./mobile_nav_controller"
+application.register("mobile-nav", MobileNavController)

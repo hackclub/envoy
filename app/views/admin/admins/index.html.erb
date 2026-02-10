@@ -4,56 +4,101 @@
 </div>
 
 <div class="bg-white rounded-lg shadow overflow-hidden">
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-      <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Events</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Sign In</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <% @admins.each do |admin| %>
-        <tr class="hover:bg-gray-50">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="font-medium text-gray-900"><%= admin.full_name %></div>
-            <% if admin == current_admin %>
-              <span class="text-xs text-gray-500">(you)</span>
-            <% end %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <%= admin.email %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <% if admin.super_admin? %>
-              <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Super Admin</span>
-            <% else %>
-              <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Admin</span>
-            <% end %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-            <%= admin.events.count %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+  <!-- Desktop table -->
+  <div class="hidden md:block overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Events</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Sign In</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @admins.each do |admin| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="font-medium text-gray-900"><%= admin.full_name %></div>
+              <% if admin == current_admin %>
+                <span class="text-xs text-gray-500">(you)</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <%= admin.email %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <% if admin.super_admin? %>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Super Admin</span>
+              <% else %>
+                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Admin</span>
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <%= admin.events.count %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <% if admin.last_sign_in_at %>
+                <%= time_ago_in_words(admin.last_sign_in_at) %> ago
+              <% else %>
+                Never
+              <% end %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+              <%= link_to "Edit", edit_admin_admin_path(admin), class: "text-blue-600 hover:text-blue-900" %>
+              <% if policy(admin).destroy? %>
+                <%= button_to "Delete", admin_admin_path(admin), method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to delete #{admin.full_name}?" },
+                    class: "text-red-600 hover:text-red-900" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="md:hidden divide-y divide-gray-200">
+    <% @admins.each do |admin| %>
+      <div class="p-4 hover:bg-gray-50">
+        <div class="flex justify-between items-start mb-2">
+          <div>
+            <p class="font-medium text-gray-900">
+              <%= admin.full_name %>
+              <% if admin == current_admin %>
+                <span class="text-xs text-gray-500">(you)</span>
+              <% end %>
+            </p>
+            <p class="text-sm text-gray-500"><%= admin.email %></p>
+          </div>
+          <% if admin.super_admin? %>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Super Admin</span>
+          <% else %>
+            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Admin</span>
+          <% end %>
+        </div>
+        <div class="text-sm text-gray-500 space-y-1">
+          <p><span class="font-medium text-gray-700">Events:</span> <%= admin.events.count %></p>
+          <p><span class="font-medium text-gray-700">Last Sign In:</span>
             <% if admin.last_sign_in_at %>
               <%= time_ago_in_words(admin.last_sign_in_at) %> ago
             <% else %>
               Never
             <% end %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-            <%= link_to "Edit", edit_admin_admin_path(admin), class: "text-blue-600 hover:text-blue-900" %>
-            <% if policy(admin).destroy? %>
-              <%= button_to "Delete", admin_admin_path(admin), method: :delete,
-                  data: { turbo_confirm: "Are you sure you want to delete #{admin.full_name}?" },
-                  class: "text-red-600 hover:text-red-900" %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+          </p>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-3">
+          <%= link_to "Edit", edit_admin_admin_path(admin), class: "text-blue-600 hover:text-blue-900 text-sm font-medium" %>
+          <% if policy(admin).destroy? %>
+            <%= button_to "Delete", admin_admin_path(admin), method: :delete,
+                data: { turbo_confirm: "Are you sure you want to delete #{admin.full_name}?" },
+                class: "text-red-600 hover:text-red-900 text-sm font-medium" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>

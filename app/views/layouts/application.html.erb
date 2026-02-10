@@ -70,7 +70,7 @@
       </div>
     </div>
     <% end %>
-    <nav class="bg-white border-b-4 border-blue-700 shadow-sm">
+    <nav class="bg-white border-b-4 border-blue-700 shadow-sm" data-controller="mobile-nav">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-20">
           <div class="flex items-center">
@@ -78,10 +78,23 @@
               <img src="/logo.svg?v=2" alt="Hack Club" class="h-12">
             <% end %>
           </div>
-          <div class="flex items-center space-x-6">
+          <div class="hidden sm:flex items-center space-x-6">
             <%= link_to "Home", events_path, class: "text-blue-900 font-semibold hover:underline" %>
             <%= link_to "Check Application Status", lookup_application_path, class: "text-blue-900 font-semibold hover:underline" %>
           </div>
+          <div class="flex items-center sm:hidden">
+            <button data-action="click->mobile-nav#toggle" type="button" class="text-blue-900 hover:text-blue-700 p-2" aria-label="Toggle menu">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hidden sm:hidden border-t border-gray-200" data-mobile-nav-target="menu">
+        <div class="px-4 py-3 space-y-2">
+          <%= link_to "Home", events_path, class: "block text-blue-900 font-semibold hover:underline py-2" %>
+          <%= link_to "Check Application Status", lookup_application_path, class: "block text-blue-900 font-semibold hover:underline py-2" %>
         </div>
       </div>
     </nav>

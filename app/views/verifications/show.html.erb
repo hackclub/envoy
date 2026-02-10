@@ -1,12 +1,12 @@
 <div class="max-w-md mx-auto">
-  <div class="bg-blue-900 text-white py-12 px-6 mb-8">
+  <div class="bg-blue-900 text-white py-8 sm:py-12 px-4 sm:px-6 mb-8">
     <div class="text-center">
       <h1 class="text-3xl font-bold mb-4">Verify Visa Letter</h1>
       <p class="text-lg text-gray-300">Enter the verification code from your visa invitation letter to confirm its authenticity.</p>
     </div>
   </div>
 
-  <div class="bg-white border border-gray-300 shadow-sm p-8">
+  <div class="bg-white border border-gray-300 shadow-sm p-4 sm:p-8">
     <%= form_with url: verify_path, method: :post, class: "space-y-6", data: { turbo: false } do %>
       <div>
         <%= label_tag :code, "Verification Code", class: "block text-sm font-semibold text-gray-700 mb-1" %>

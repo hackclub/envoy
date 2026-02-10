@@ -1,5 +1,5 @@
 <div class="max-w-2xl mx-auto">
-  <div class="bg-blue-900 text-white py-12 px-6 mb-8">
+  <div class="bg-blue-900 text-white py-8 sm:py-12 px-4 sm:px-6 mb-8">
     <div class="text-center">
       <h1 class="text-3xl font-bold mb-4">Apply for Visa Letter</h1>
       <p class="text-lg text-gray-300">Please email <a href="mailto:visas@hackclub.com" class="underline">visas@hackclub.com</a> if you need any assistance with your visa application.</p>
@@ -20,7 +20,7 @@
     </div>
   </div>
 
-  <div class="bg-white border border-gray-300 shadow-sm p-8">
+  <div class="bg-white border border-gray-300 shadow-sm p-4 sm:p-8">
     <h2 class="text-xl font-bold text-blue-900 mb-6">Personal Information</h2>
 
     <%= form_with model: @participant, url: event_applications_path(event_slug: @event.slug), class: "space-y-6" do |f| %>

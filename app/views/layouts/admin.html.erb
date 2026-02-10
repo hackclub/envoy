@@ -22,11 +22,11 @@
   </head>
 
   <body class="bg-gray-100 min-h-screen">
-    <nav class="bg-blue-900">
+    <nav class="bg-blue-900" data-controller="mobile-nav">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex items-center">
-            <%= link_to "Hack Club ITP Admin", admin_dashboard_path, class: "text-xl font-bold text-white" %>
+            <%= link_to "Hack Club ITP Admin", admin_dashboard_path, class: "text-lg sm:text-xl font-bold text-white" %>
             <div class="hidden md:flex ml-10 space-x-4">
               <%= link_to "Events", admin_events_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
               <%= link_to "Applications", admin_visa_letter_applications_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
@@ -36,7 +36,7 @@
               <% end %>
             </div>
           </div>
-          <div class="flex items-center space-x-4">
+          <div class="hidden md:flex items-center space-x-4">
             <span class="text-gray-300 text-sm">
               <%= current_admin.full_name %>
               <% if current_admin.super_admin? %>
@@ -46,6 +46,29 @@
             <%= link_to "Settings", admin_settings_path, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
             <%= link_to "View Site", root_path, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
             <%= button_to "Sign Out", destroy_admin_session_path, method: :delete, class: "text-gray-300 hover:text-white text-sm hover:underline" %>
+          </div>
+          <div class="flex items-center md:hidden">
+            <button data-action="click->mobile-nav#toggle" type="button" class="text-gray-300 hover:text-white p-2" aria-label="Toggle menu">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hidden md:hidden border-t border-blue-800" data-mobile-nav-target="menu">
+        <div class="px-4 py-3 space-y-1">
+          <%= link_to "Events", admin_events_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
+          <%= link_to "Applications", admin_visa_letter_applications_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
+          <%= link_to "Templates", admin_letter_templates_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
+          <% if current_admin.super_admin? %>
+            <%= link_to "Admins", admin_admins_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
+          <% end %>
+          <div class="border-t border-blue-800 pt-2 mt-2">
+            <span class="block text-gray-300 text-sm px-3 py-1"><%= current_admin.full_name %></span>
+            <%= link_to "Settings", admin_settings_path, class: "block text-gray-300 hover:text-white text-sm px-3 py-2" %>
+            <%= link_to "View Site", root_path, class: "block text-gray-300 hover:text-white text-sm px-3 py-2" %>
+            <%= button_to "Sign Out", destroy_admin_session_path, method: :delete, class: "block text-gray-300 hover:text-white text-sm px-3 py-2 text-left w-full" %>
           </div>
         </div>
       </div>
