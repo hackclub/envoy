@@ -31,14 +31,16 @@ class VisaLetterApplicationsController < ApplicationController
     if existing_participant
       existing_application = existing_participant.visa_letter_applications.find_by(event: @event)
 
-      if existing_application && !existing_application.rejected?
-        @participant = Participant.new(participant_params)
-        flash.now[:alert] = "An application for this email already exists for this event. Please check your email for status updates."
-        render :new, status: :unprocessable_entity
-        return
+      if existing_application
+        if existing_application.soft_rejected? || existing_application.pending_verification?
+          existing_application.destroy
+        elsif !existing_application.rejected?
+          @participant = Participant.new(participant_params)
+          flash.now[:alert] = "An application for this email already exists for this event. Please check your email for status updates."
+          render :new, status: :unprocessable_entity
+          return
+        end
       end
-
-      existing_application&.destroy if existing_application&.soft_rejected?
     end
 
     @participant = existing_participant || Participant.new

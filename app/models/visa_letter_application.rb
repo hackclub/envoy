@@ -109,7 +109,7 @@ class VisaLetterApplication < ApplicationRecord
   end
 
   def can_reapply?
-    soft_rejected?
+    soft_rejected? || pending_verification?
   end
 
   def mark_letter_generated!
