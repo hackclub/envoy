@@ -162,7 +162,7 @@ GEM
       nokogiri (~> 1)
     hashie (5.1.0)
       logger
-    hexapdf (1.5.0)
+    hexapdf (1.6.0)
       cmdparse (~> 3.0, >= 3.0.3)
       geom2d (~> 0.4, >= 0.4.1)
       openssl (>= 2.2.1)
