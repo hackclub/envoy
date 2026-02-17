@@ -1,29 +1,41 @@
 class VisaLetterApplicationsController < ApplicationController
   before_action :set_event, only: [ :new, :create ]
+  before_action :set_invitation, only: [ :new, :create ]
   before_action :set_application, only: [ :show ]
 
   def new
-    unless @event.accepting_applications?
+    unless @invitation || @event.accepting_applications?
       redirect_to events_path, alert: "This event is no longer accepting applications."
       return
     end
 
     @participant = Participant.new
+    @participant.email = @invitation.email if @invitation
   end
 
   def create
-    unless @event.accepting_applications?
+    unless @invitation || @event.accepting_applications?
       redirect_to events_path, alert: "This event is no longer accepting applications."
       return
     end
 
     email = participant_params[:email].to_s.strip.downcase
 
-    if VisaLetterApplication.email_hard_rejected_for_event?(email, @event)
+    if @invitation && email != @invitation.email
       @participant = Participant.new(participant_params)
-      flash.now[:alert] = "This email address is not eligible to apply for this event. If you believe this is an error, please contact #{@event.contact_email}."
+      @participant.email = @invitation.email
+      flash.now[:alert] = "The email address must match the invitation email (#{@invitation.email})."
       render :new, status: :unprocessable_entity
       return
+    end
+
+    unless @invitation
+      if VisaLetterApplication.email_hard_rejected_for_event?(email, @event)
+        @participant = Participant.new(participant_params)
+        flash.now[:alert] = "This email address is not eligible to apply for this event. If you believe this is an error, please contact #{@event.contact_email}."
+        render :new, status: :unprocessable_entity
+        return
+      end
     end
 
     existing_participant = Participant.find_by(email: email)
@@ -32,7 +44,9 @@ class VisaLetterApplicationsController < ApplicationController
       existing_application = existing_participant.visa_letter_applications.find_by(event: @event)
 
       if existing_application
-        if existing_application.soft_rejected? || existing_application.pending_verification?
+        if @invitation
+          existing_application.destroy
+        elsif existing_application.soft_rejected? || existing_application.pending_verification?
           existing_application.destroy
         elsif !existing_application.rejected?
           @participant = Participant.new(participant_params)
@@ -50,13 +64,18 @@ class VisaLetterApplicationsController < ApplicationController
       @application = @participant.visa_letter_applications.build(event: @event)
 
       if @application.save
+        @invitation&.claim!(@application)
+
         @participant.generate_verification_code!
         SendVerificationEmailJob.perform_later(@participant.id)
+
+        metadata = { event_id: @event.id, participant_email: @participant.email }
+        metadata[:manual_invitation_id] = @invitation.id if @invitation
 
         ActivityLog.log!(
           trackable: @application,
           action: "application_created",
-          metadata: { event_id: @event.id, participant_email: @participant.email },
+          metadata: metadata,
           request: request
         )
 
@@ -181,6 +200,12 @@ class VisaLetterApplicationsController < ApplicationController
 
   def set_event
     @event = Event.find_by!(slug: params[:event_slug])
+  end
+
+  def set_invitation
+    if params[:invitation].present?
+      @invitation = ManualInvitation.pending.find_by(token: params[:invitation], event: @event)
+    end
   end
 
   def set_application

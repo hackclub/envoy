@@ -51,6 +51,20 @@ class ApplicationMailer < ActionMailer::Base
     )
   end
 
+  def manual_invitation(invitation)
+    @invitation = invitation
+    @event = invitation.event
+    @apply_url = new_event_application_url(
+      @event.slug,
+      invitation: invitation.token
+    )
+
+    mail(
+      to: invitation.email,
+      subject: "You're Invited to Apply for a Visa Letter - #{@event.name}"
+    )
+  end
+
   def rejection_downgraded(application)
     @application = application
     @participant = application.participant

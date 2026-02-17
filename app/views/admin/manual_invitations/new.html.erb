@@ -1,0 +1,57 @@
+<div class="max-w-lg mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Manual Visa Letter Issuance</h1>
+  </div>
+
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-yellow-700">
+          This will send an email to the participant inviting them to fill out a visa letter application.
+          This bypasses the submission deadline and any previous application restrictions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= form_with model: [:admin, @invitation], url: admin_manual_invitations_path, class: "space-y-6" do |f| %>
+      <% if @invitation.errors.any? %>
+        <div class="bg-red-50 border-l-4 border-red-500 p-4">
+          <h3 class="text-red-800 font-medium mb-2">Please correct the following errors:</h3>
+          <ul class="list-disc list-inside text-red-700 text-sm">
+            <% @invitation.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :event_id, "Event", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :event_id, options_for_select(
+          @events.map { |e| ["#{e.name} (#{e.date_range})", e.id] },
+          @invitation.event_id
+        ), { prompt: "Select an event..." },
+        { required: true, class: "w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" } %>
+      </div>
+
+      <div>
+        <%= f.label :email, "Participant Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.email_field :email, required: true, placeholder: "participant@example.com",
+            class: "w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        <p class="text-xs text-gray-500 mt-1">The participant will receive an email with a link to fill out their visa letter application.</p>
+      </div>
+
+      <div class="flex items-center justify-between pt-4">
+        <%= link_to "Cancel", admin_manual_invitations_path, class: "text-gray-500 hover:text-gray-700 text-sm" %>
+        <%= f.submit "Send Invitation", class: "bg-blue-600 text-white py-2 px-6 rounded-md hover:bg-blue-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -67,6 +67,7 @@ Rails.application.routes.draw do
       end
     end
     resources :admins
+    resources :manual_invitations, only: [ :index, :new, :create ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
