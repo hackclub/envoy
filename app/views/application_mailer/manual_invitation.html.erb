@@ -1,0 +1,25 @@
+<h1>Visa Letter Invitation</h1>
+
+<p>Hello,</p>
+
+<p>You have been invited to apply for a visa invitation letter for <strong><%= @event.name %></strong>.</p>
+
+<h2>Event Details</h2>
+<ul>
+  <li><strong>Event:</strong> <%= @event.name %></li>
+  <li><strong>Dates:</strong> <%= @event.date_range %></li>
+  <li><strong>Location:</strong> <%= @event.full_address %></li>
+</ul>
+
+<p>Please click the link below to fill out your visa letter application:</p>
+
+<p style="margin: 20px 0;">
+  <a href="<%= @apply_url %>" style="background-color: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Apply for Visa Letter</a>
+</p>
+
+<p>If the button above doesn't work, copy and paste this URL into your browser:</p>
+<p style="word-break: break-all;"><%= @apply_url %></p>
+
+<p>If you have any questions, please contact us at <%= @event.contact_email %>.</p>
+
+<p>Best regards,<br>The Hack Club Team</p>
