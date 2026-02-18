@@ -2,8 +2,8 @@ class BackfillRejectionTypeOnVisaLetterApplications < ActiveRecord::Migration[8.
   def up
     # Set existing rejected applications to soft reject by default
     execute <<-SQL
-      UPDATE visa_letter_applications 
-      SET rejection_type = 'soft' 
+      UPDATE visa_letter_applications
+      SET rejection_type = 'soft'
       WHERE status = 'rejected' AND rejection_type IS NULL
     SQL
   end
