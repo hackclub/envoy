@@ -66,20 +66,38 @@ class VisaLetterApplicationsController < ApplicationController
       if @application.save
         @invitation&.claim!(@application)
 
-        @participant.generate_verification_code!
-        SendVerificationEmailJob.perform_later(@participant.id)
+        if @invitation
+          # Skip email verification for manual invitations — the admin already
+          # verified the recipient when creating the invitation.
+          @participant.update!(email_verified_at: Time.current)
+          @application.mark_as_submitted!
 
-        metadata = { event_id: @event.id, participant_email: @participant.email }
-        metadata[:manual_invitation_id] = @invitation.id if @invitation
+          ActivityLog.log!(
+            trackable: @application,
+            action: "application_created",
+            metadata: { event_id: @event.id, participant_email: @participant.email,
+                        manual_invitation_id: @invitation.id, email_verification_skipped: true },
+            request: request
+          )
 
-        ActivityLog.log!(
-          trackable: @application,
-          action: "application_created",
-          metadata: metadata,
-          request: request
-        )
+          ApplicationMailer.application_submitted(@application).deliver_later
+          AdminMailer.new_application_notification(@application).deliver_later
 
-        redirect_to verify_email_visa_letter_application_path(@application)
+          redirect_to visa_letter_application_path(@application),
+                      notice: "Your application has been submitted!"
+        else
+          @participant.generate_verification_code!
+          SendVerificationEmailJob.perform_later(@participant.id)
+
+          ActivityLog.log!(
+            trackable: @application,
+            action: "application_created",
+            metadata: { event_id: @event.id, participant_email: @participant.email },
+            request: request
+          )
+
+          redirect_to verify_email_visa_letter_application_path(@application)
+        end
       else
         render :new, status: :unprocessable_entity
       end
