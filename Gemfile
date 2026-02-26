@@ -63,5 +63,5 @@ group :test do
   gem "shoulda-matchers"
 end
 
-gem "sentry-ruby", "~> 6.3"
+gem "sentry-ruby", "~> 6.4"
 gem "sentry-rails", "~> 6.3"
