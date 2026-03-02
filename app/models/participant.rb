@@ -25,6 +25,7 @@ class Participant < ApplicationRecord
     self.verification_code = SecureRandom.random_number(1_000_000).to_s.rjust(6, "0")
     self.verification_code_sent_at = Time.current
     self.verification_attempts = 0
+    self.email_verified_at = nil
     save!
   end
 
