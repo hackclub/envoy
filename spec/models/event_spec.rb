@@ -36,9 +36,39 @@ RSpec.describe Event, type: :model do
 
   describe "associations" do
     it { should belong_to(:admin) }
+    it { should have_many(:event_admins).dependent(:destroy) }
+    it { should have_many(:additional_admins).through(:event_admins) }
     it { should have_one(:letter_template).dependent(:destroy) }
     it { should have_many(:visa_letter_applications).dependent(:restrict_with_error) }
     it { should have_many(:participants).through(:visa_letter_applications) }
+  end
+
+  describe "#admin?" do
+    let(:event) { create(:event) }
+    let(:other_admin) { create(:admin) }
+
+    it "returns true for the event owner" do
+      expect(event.admin?(event.admin)).to be true
+    end
+
+    it "returns true for an additional admin" do
+      create(:event_admin, event: event, admin: other_admin)
+      expect(event.admin?(other_admin)).to be true
+    end
+
+    it "returns false for an unrelated admin" do
+      expect(event.admin?(other_admin)).to be false
+    end
+  end
+
+  describe "#all_admins" do
+    it "returns the owner and additional admins" do
+      event = create(:event)
+      additional = create(:admin)
+      create(:event_admin, event: event, admin: additional)
+
+      expect(event.all_admins).to include(event.admin, additional)
+    end
   end
 
   describe "scopes" do

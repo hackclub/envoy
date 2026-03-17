@@ -15,6 +15,9 @@ class AdminMailer < ActionMailer::Base
       recipients << event_owner.email
     end
 
+    # Add additional event admins who want notifications
+    recipients += @event.additional_admins.where(notify_new_applications: true).pluck(:email)
+
     # Add super admins who want notifications
     recipients += Admin.where(super_admin: true, notify_new_applications: true).pluck(:email)
 

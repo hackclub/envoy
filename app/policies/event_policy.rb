@@ -12,7 +12,7 @@ class EventPolicy < ApplicationPolicy
   end
 
   def update?
-    user.present? && (user.super_admin? || record.admin_id == user.id)
+    user.present? && (user.super_admin? || record.admin?(user))
   end
 
   def destroy?
@@ -25,6 +25,7 @@ class EventPolicy < ApplicationPolicy
         scope.all
       elsif user.present?
         scope.where(admin_id: user.id)
+             .or(scope.where(id: EventAdmin.where(admin_id: user.id).select(:event_id)))
       else
         scope.active
       end
