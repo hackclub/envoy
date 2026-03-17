@@ -1,8 +1,18 @@
 class Event < ApplicationRecord
   belongs_to :admin
+  has_many :event_admins, dependent: :destroy
+  has_many :additional_admins, through: :event_admins, source: :admin
   has_one :letter_template, dependent: :destroy
   has_many :visa_letter_applications, dependent: :restrict_with_error
   has_many :participants, through: :visa_letter_applications
+
+  def all_admins
+    Admin.where(id: [ admin_id ] + event_admins.pluck(:admin_id))
+  end
+
+  def admin?(admin)
+    admin_id == admin.id || event_admins.exists?(admin_id: admin.id)
+  end
 
   validate :rejection_reason_templates_format
   validates :name, presence: true, length: { maximum: 255 }

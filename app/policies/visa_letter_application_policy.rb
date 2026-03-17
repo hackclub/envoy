@@ -28,7 +28,9 @@ class VisaLetterApplicationPolicy < ApplicationPolicy
       if user&.super_admin?
         scope.all
       elsif user.present?
-        scope.joins(:event).where(events: { admin_id: user.id })
+        owned_event_ids = Event.where(admin_id: user.id).select(:id)
+        collaborative_event_ids = EventAdmin.where(admin_id: user.id).select(:event_id)
+        scope.where(event_id: owned_event_ids).or(scope.where(event_id: collaborative_event_ids))
       else
         scope.none
       end

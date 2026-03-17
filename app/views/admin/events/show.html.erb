@@ -119,6 +119,16 @@
       <dt class="text-sm font-medium text-gray-500">Application Deadline</dt>
       <dd class="text-gray-900"><%= @event.application_deadline&.strftime("%B %d, %Y at %I:%M %p") || "No deadline" %></dd>
     </div>
+    <div>
+      <dt class="text-sm font-medium text-gray-500">Owner</dt>
+      <dd class="text-gray-900"><%= @event.admin.full_name %></dd>
+    </div>
+    <% if @event.additional_admins.any? %>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Additional Admins</dt>
+        <dd class="text-gray-900"><%= @event.additional_admins.order(:last_name, :first_name).map(&:full_name).join(", ") %></dd>
+      </div>
+    <% end %>
   </dl>
 </div>
 

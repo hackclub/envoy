@@ -3,6 +3,8 @@ class Admin < ApplicationRecord
          :omniauthable, omniauth_providers: [ :hack_club ]
 
   has_many :events, dependent: :restrict_with_error
+  has_many :event_admins, dependent: :destroy
+  has_many :collaborative_events, through: :event_admins, source: :event
   has_many :reviewed_applications, class_name: "VisaLetterApplication", foreign_key: :reviewed_by_id, dependent: :nullify
   has_many :activity_logs, dependent: :nullify
 
