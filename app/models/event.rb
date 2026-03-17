@@ -7,7 +7,7 @@ class Event < ApplicationRecord
   has_many :participants, through: :visa_letter_applications
 
   def all_admins
-    Admin.where(id: [admin_id] + event_admins.pluck(:admin_id))
+    Admin.where(id: [ admin_id ] + event_admins.pluck(:admin_id))
   end
 
   def admin?(admin)

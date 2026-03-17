@@ -6,6 +6,6 @@ class CreateEventAdmins < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :event_admins, [:event_id, :admin_id], unique: true
+    add_index :event_admins, [ :event_id, :admin_id ], unique: true
   end
 end

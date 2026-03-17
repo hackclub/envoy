@@ -83,7 +83,7 @@ class Admin::EventsController < Admin::BaseController
       return unless params[:event]&.key?(:admin_ids)
       admin_ids = Array(params[:event][:admin_ids]).reject(&:blank?)
       # Don't include the event owner in the join table
-      admin_ids -= [event.admin_id]
+      admin_ids -= [ event.admin_id ]
       event.event_admins.where.not(admin_id: admin_ids).destroy_all
       admin_ids.each do |admin_id|
         event.event_admins.find_or_create_by(admin_id: admin_id)
