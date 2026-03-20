@@ -67,7 +67,7 @@ class LetterTemplate < ApplicationRecord
     }
 
     replacements.each do |placeholder, value|
-      result.gsub!(placeholder, value.to_s)
+      result.gsub!(placeholder, ERB::Util.html_escape(value.to_s))
     end
 
     result

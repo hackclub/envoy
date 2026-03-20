@@ -19,50 +19,9 @@
     <%= Date.current.strftime("%B %d, %Y") %>
   </div>
 
-  <%# Salutation %>
-  <div class="salutation">
-    To whomever it may concern,
-  </div>
-
-  <%# Letter Body %>
+  <%# Letter Body (rendered from template) %>
   <div class="letter-body">
-    <p>
-      We are pleased to invite <%= @participant.full_name %> to participate in Hack Club <%= @event.name %>, an international coding conference for student leaders hosted by The Hack Foundation (dba. Hack Club).
-    </p>
-
-    <div class="indented-block">
-      <p>Conference Date: <%= @event.date_range %></p>
-      <p>Conference Location: <%= @event.venue_name %>, <%= @event.city %>, <%= @event.country %></p>
-    </div>
-
-    <p>
-      The Hack Foundation is a 501(c)(3) nonprofit organization dedicated to improving global access to quality computer science education. We run the largest network of teenage programmers in the world, with over 55,000 members spanning more than 45 nations. We are supported by silicon tech giants like Michael Dell and Tom-Preston Werner.
-    </p>
-
-    <p>
-      We fully anticipate that the participation and contributions of <%= @participant.full_name %> are extremely valuable to the success of the conference and their inability to attend the conference will greatly impact our programme. This conference (and The Hack Foundation) will benefit from their diverse perspective and experience.
-    </p>
-
-    <div class="participant-details">
-      <p>Name: <%= @participant.full_name %></p>
-      <p>Date of Birth: <%= @participant.date_of_birth.strftime("%B %d, %Y") %></p>
-      <p>Country of Birth: <%= @participant.country_of_birth %></p>
-      <p>Phone Number: <%= @participant.phone_number %></p>
-      <p>Address: <%= @participant.full_street_address %></p>
-    </div>
-
-    <p>
-      All costs associated with attending this conference (including travel, accommodation, food, and more) will be covered by The Hack Foundation.
-    </p>
-
-    <p>
-      On behalf of The Hack Foundation, we would be extremely grateful if you could grant <%= @participant.full_name %> a Visa as we look forward to their contributions in <%= @event.city %>. In the case of any questions, please do not hesitate to contact us via <a href="mailto:<%= @event.contact_email %>" style="color: #000000;"><%= @event.contact_email %></a>.
-    </p>
-  </div>
-
-  <%# Closing %>
-  <div class="closing">
-    Kindly,
+    <%= simple_format(@rendered_body) %>
   </div>
 
   <%# Signature Block %>
