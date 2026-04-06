@@ -107,6 +107,11 @@
       <%= f.check_box :applications_open, class: "h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded" %>
       <%= f.label :applications_open, "Accepting applications", class: "ml-2 text-sm text-gray-700" %>
     </div>
+
+    <div class="flex items-center">
+      <%= f.check_box :private, class: "h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded" %>
+      <%= f.label :private, "Private (only accessible via direct link)", class: "ml-2 text-sm text-gray-700" %>
+    </div>
   </div>
 
   <div class="border-t pt-6">

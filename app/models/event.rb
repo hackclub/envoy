@@ -32,6 +32,7 @@ class Event < ApplicationRecord
   before_validation :generate_slug, on: :create
 
   scope :active, -> { where(active: true) }
+  scope :publicly_listed, -> { where(private: false) }
   scope :accepting_applications, -> { active.where(applications_open: true).where("application_deadline IS NULL OR application_deadline > ?", Time.current) }
   scope :upcoming, -> { where("start_date >= ?", Date.current) }
   scope :past, -> { where("end_date < ?", Date.current) }

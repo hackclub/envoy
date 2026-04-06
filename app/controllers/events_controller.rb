@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   def index
-    @events = Event.active.accepting_applications.upcoming.order(:start_date)
+    @events = Event.active.publicly_listed.accepting_applications.upcoming.order(:start_date)
   end
 
   def show
