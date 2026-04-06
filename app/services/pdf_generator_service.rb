@@ -1,7 +1,7 @@
 class PdfGeneratorService
   def initialize(application)
     @application = application
-    @template = application.event.effective_letter_template
+    @template = application.event.reload.effective_letter_template
   end
 
   def generate
