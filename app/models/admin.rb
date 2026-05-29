@@ -7,6 +7,7 @@ class Admin < ApplicationRecord
   has_many :collaborative_events, through: :event_admins, source: :event
   has_many :reviewed_applications, class_name: "VisaLetterApplication", foreign_key: :reviewed_by_id, dependent: :nullify
   has_many :activity_logs, dependent: :nullify
+  has_many :event_notification_preferences, dependent: :destroy
 
   validates :first_name, presence: true, length: { maximum: 100 }
   validates :last_name, presence: true, length: { maximum: 100 }
@@ -30,6 +31,28 @@ class Admin < ApplicationRecord
 
   def full_name
     "#{first_name} #{last_name}"
+  end
+
+  # Events whose applications this admin could receive notifications about.
+  # Super admins can be notified about every event; other admins only about
+  # events they own or collaborate on.
+  def notifiable_events
+    if super_admin?
+      Event.all
+    else
+      Event.where(id: events.select(:id)).or(Event.where(id: collaborative_events.select(:id)))
+    end
+  end
+
+  # Whether this admin wants new-application emails for the given event.
+  # An explicit per-event preference takes precedence; otherwise we fall back
+  # to the account-wide default so existing behaviour (and new events) keep
+  # working without requiring the admin to opt in event by event.
+  def notify_new_applications_for?(event)
+    preference = event_notification_preferences.find_by(event_id: event.id)
+    return preference.notify_new_applications unless preference.nil?
+
+    notify_new_applications?
   end
 
   def rememberable_value

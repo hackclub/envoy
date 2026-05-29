@@ -5,6 +5,7 @@ class Event < ApplicationRecord
   has_one :letter_template, dependent: :destroy
   has_many :visa_letter_applications, dependent: :restrict_with_error
   has_many :participants, through: :visa_letter_applications
+  has_many :event_notification_preferences, dependent: :destroy
 
   def all_admins
     Admin.where(id: [ admin_id ] + event_admins.pluck(:admin_id))

@@ -7,21 +7,16 @@ class AdminMailer < ActionMailer::Base
     @participant = application.participant
     @event = application.event
 
-    recipients = []
+    # The event owner, additional event admins, and super admins are all
+    # candidates. Each decides per-event whether they want new-application
+    # emails (see Admin#notify_new_applications_for?).
+    candidate_admins = ([ @event.admin ] + @event.additional_admins.to_a + Admin.where(super_admin: true).to_a).uniq
 
-    # Add event owner if they want notifications
-    event_owner = @event.admin
-    if event_owner.notify_new_applications?
-      recipients << event_owner.email
-    end
-
-    # Add additional event admins who want notifications
-    recipients += @event.additional_admins.where(notify_new_applications: true).pluck(:email)
-
-    # Add super admins who want notifications
-    recipients += Admin.where(super_admin: true, notify_new_applications: true).pluck(:email)
-
-    recipients = recipients.uniq.compact
+    recipients = candidate_admins
+                 .select { |admin| admin.notify_new_applications_for?(@event) }
+                 .map(&:email)
+                 .uniq
+                 .compact
 
     return if recipients.empty?
 

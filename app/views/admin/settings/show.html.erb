@@ -3,26 +3,53 @@
   <p class="text-gray-500">Manage your notification preferences</p>
 </div>
 
-<div class="bg-white rounded-lg shadow p-6 max-w-2xl">
-  <%= form_with model: @admin, url: admin_settings_path, method: :patch, class: "space-y-6" do |f| %>
+<div class="bg-white rounded-lg shadow p-6 max-w-3xl">
+  <%= form_with url: admin_settings_path, method: :patch, class: "space-y-6" do %>
     <div>
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Email Notifications</h2>
-      
-      <div class="space-y-4">
-        <div class="flex items-start">
-          <div class="flex items-center h-5">
-            <%= f.check_box :notify_new_applications, class: "h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded" %>
-          </div>
-          <div class="ml-3">
-            <%= f.label :notify_new_applications, "New application notifications", class: "text-sm font-medium text-gray-700" %>
-            <p class="text-sm text-gray-500">Receive an email when a new visa letter application is submitted for your events.</p>
-          </div>
+      <h2 class="text-lg font-medium text-gray-900">Email Notifications</h2>
+      <p class="text-sm text-gray-500 mb-4">
+        Choose which events you want to receive new visa letter application emails for.
+        Uncheck an event to stop receiving notifications about its applications.
+      </p>
+
+      <% if @events.any? %>
+        <div class="overflow-x-auto border border-gray-200 rounded-md">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
+                <th scope="col" class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">New applications</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @events.each do |event| %>
+                <tr>
+                  <td class="px-4 py-3">
+                    <div class="text-sm font-medium text-gray-900"><%= event.name %></div>
+                    <div class="text-xs text-gray-500"><%= event.date_range %></div>
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <%= hidden_field_tag "notification_preferences[#{event.id}]", "0" %>
+                    <%= check_box_tag "notification_preferences[#{event.id}]",
+                          "1",
+                          @admin.notify_new_applications_for?(event),
+                          id: "notify_new_applications_#{event.id}",
+                          class: "h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
-      </div>
+      <% else %>
+        <p class="text-sm text-gray-500 italic">You don't have any events yet. Once you create or are added to an event, it will appear here.</p>
+      <% end %>
     </div>
 
-    <div class="pt-4 border-t">
-      <%= f.submit "Save Settings", class: "bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 cursor-pointer" %>
-    </div>
+    <% if @events.any? %>
+      <div class="pt-4 border-t">
+        <%= submit_tag "Save Settings", class: "bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 cursor-pointer" %>
+      </div>
+    <% end %>
   <% end %>
 </div>
