@@ -3,21 +3,33 @@ class Admin::SettingsController < Admin::BaseController
 
   def show
     @admin = current_admin
+    @events = notifiable_events
   end
 
   def update
     @admin = current_admin
 
-    if @admin.update(settings_params)
-      redirect_to admin_settings_path, notice: "Settings updated successfully."
-    else
-      render :show, status: :unprocessable_entity
-    end
+    update_notification_preferences
+
+    redirect_to admin_settings_path, notice: "Notification preferences updated successfully."
   end
 
   private
 
-  def settings_params
-    params.require(:admin).permit(:notify_new_applications)
+  def notifiable_events
+    current_admin.notifiable_events.order(start_date: :desc, name: :asc)
+  end
+
+  def update_notification_preferences
+    submitted = params.fetch(:notification_preferences, {}).to_unsafe_h
+    allowed_event_ids = current_admin.notifiable_events.pluck(:id).to_set
+
+    submitted.each do |event_id, value|
+      next unless allowed_event_ids.include?(event_id)
+
+      preference = current_admin.event_notification_preferences.find_or_initialize_by(event_id: event_id)
+      preference.notify_new_applications = ActiveModel::Type::Boolean.new.cast(value)
+      preference.save
+    end
   end
 end

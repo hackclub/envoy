@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_114101) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_29_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -92,6 +92,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_114101) do
     t.index ["admin_id"], name: "index_event_admins_on_admin_id"
     t.index ["event_id", "admin_id"], name: "index_event_admins_on_event_id_and_admin_id", unique: true
     t.index ["event_id"], name: "index_event_admins_on_event_id"
+  end
+
+  create_table "event_notification_preferences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "admin_id", null: false
+    t.datetime "created_at", null: false
+    t.uuid "event_id", null: false
+    t.boolean "notify_new_applications", default: true, null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_id", "event_id"], name: "index_event_notification_preferences_on_admin_id_and_event_id", unique: true
+    t.index ["admin_id"], name: "index_event_notification_preferences_on_admin_id"
+    t.index ["event_id"], name: "index_event_notification_preferences_on_event_id"
   end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -201,6 +212,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_114101) do
   add_foreign_key "activity_logs", "admins"
   add_foreign_key "event_admins", "admins"
   add_foreign_key "event_admins", "events"
+  add_foreign_key "event_notification_preferences", "admins"
+  add_foreign_key "event_notification_preferences", "events"
   add_foreign_key "events", "admins"
   add_foreign_key "letter_templates", "events"
   add_foreign_key "manual_invitations", "admins"
