@@ -1,5 +1,13 @@
 class Admins::OmniauthCallbacksController < Devise::OmniauthCallbacksController
-  skip_before_action :verify_authenticity_token, only: :hack_club
+  # CSRF protection is intentionally left enabled here.
+  #
+  # * The request phase (admin_hack_club_omniauth_authorize_path) is a POST and
+  #   is guarded by the omniauth-rails_csrf_protection gem plus the Rails form
+  #   authenticity token.
+  # * The callback below is reached via the provider's GET redirect (Hack Club
+  #   OIDC uses the query response mode) and is protected against CSRF by the
+  #   OAuth "state" parameter. Rails does not verify the authenticity token on
+  #   GET requests, so no before_action needs to be skipped.
 
   def hack_club
     @admin = Admin.from_omniauth(request.env["omniauth.auth"])
