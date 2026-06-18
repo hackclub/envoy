@@ -61,5 +61,20 @@ RSpec.describe Admin, type: :model do
 
       expect(admin.notify_new_applications_for?(event)).to be(false)
     end
+
+    it "does not notify a super admin about events they're not added to by default" do
+      super_admin = create(:admin, :super_admin, notify_new_applications: true)
+      other_event = create(:event, admin: admin)
+
+      expect(super_admin.notify_new_applications_for?(other_event)).to be(false)
+    end
+
+    it "notifies a super admin about events they're not added to when they opt in" do
+      super_admin = create(:admin, :super_admin, notify_new_applications: true)
+      other_event = create(:event, admin: admin)
+      create(:event_notification_preference, admin: super_admin, event: other_event, notify_new_applications: true)
+
+      expect(super_admin.notify_new_applications_for?(other_event)).to be(true)
+    end
   end
 end

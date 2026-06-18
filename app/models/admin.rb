@@ -45,12 +45,15 @@ class Admin < ApplicationRecord
   end
 
   # Whether this admin wants new-application emails for the given event.
-  # An explicit per-event preference takes precedence; otherwise we fall back
-  # to the account-wide default so existing behaviour (and new events) keep
-  # working without requiring the admin to opt in event by event.
+  # An explicit per-event preference always takes precedence. Without one, an
+  # admin only falls back to their account-wide default for events they're
+  # explicitly on (owner or collaborator). Super admins are not notified about
+  # events they haven't been added to unless they opt in per-event.
   def notify_new_applications_for?(event)
     preference = event_notification_preferences.find_by(event_id: event.id)
     return preference.notify_new_applications unless preference.nil?
+
+    return false unless event.admin?(self)
 
     notify_new_applications?
   end
