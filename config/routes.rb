@@ -68,6 +68,14 @@ Rails.application.routes.draw do
     end
     resources :admins
     resources :manual_invitations, only: [ :index, :new, :create ]
+    resources :api_keys, only: [ :index, :create, :destroy ]
+  end
+
+  namespace :api do
+    namespace :v1 do
+      resources :events, only: [ :create ]
+      resources :admins, only: [ :create ]
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

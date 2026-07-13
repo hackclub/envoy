@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_29_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -82,6 +82,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_000000) do
     t.index ["provider", "uid"], name: "index_admins_on_provider_and_uid", unique: true
     t.index ["remember_token"], name: "index_admins_on_remember_token", unique: true
     t.index ["unlock_token"], name: "index_admins_on_unlock_token", unique: true
+  end
+
+  create_table "api_keys", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "admin_id", null: false
+    t.datetime "created_at", null: false
+    t.uuid "created_by_id", null: false
+    t.datetime "last_used_at"
+    t.string "name", null: false
+    t.datetime "revoked_at"
+    t.string "token_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admin_id"], name: "index_api_keys_on_admin_id"
+    t.index ["created_by_id"], name: "index_api_keys_on_created_by_id"
+    t.index ["token_digest"], name: "index_api_keys_on_token_digest", unique: true
   end
 
   create_table "event_admins", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -210,6 +224,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_000000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activity_logs", "admins"
+  add_foreign_key "api_keys", "admins"
+  add_foreign_key "api_keys", "admins", column: "created_by_id"
   add_foreign_key "event_admins", "admins"
   add_foreign_key "event_admins", "events"
   add_foreign_key "event_notification_preferences", "admins"

@@ -33,6 +33,7 @@
               <%= link_to "Templates", admin_letter_templates_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
               <% if current_admin.super_admin? %>
                 <%= link_to "Admins", admin_admins_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
+                <%= link_to "API Keys", admin_api_keys_path, class: "text-gray-300 hover:text-white px-3 py-2 text-sm font-medium hover:underline" %>
               <% end %>
             </div>
           </div>
@@ -63,6 +64,7 @@
           <%= link_to "Templates", admin_letter_templates_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
           <% if current_admin.super_admin? %>
             <%= link_to "Admins", admin_admins_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
+            <%= link_to "API Keys", admin_api_keys_path, class: "block text-gray-300 hover:text-white px-3 py-2 text-sm font-medium" %>
           <% end %>
           <div class="border-t border-blue-800 pt-2 mt-2">
             <span class="block text-gray-300 text-sm px-3 py-1"><%= current_admin.full_name %></span>
