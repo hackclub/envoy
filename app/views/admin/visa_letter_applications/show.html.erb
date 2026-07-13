@@ -26,7 +26,11 @@
           <dd class="text-gray-900"><%= @participant.date_of_birth.strftime("%B %d, %Y") %></dd>
         </div>
         <div>
-          <dt class="text-sm font-medium text-gray-500">Country of Birth</dt>
+          <dt class="text-sm font-medium text-gray-500">Place of Birth</dt>
+          <dd class="text-gray-900"><%= @participant.place_of_birth %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Country of Citizenship</dt>
           <dd class="text-gray-900"><%= @participant.country_of_birth %></dd>
         </div>
         <div>
