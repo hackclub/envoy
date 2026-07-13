@@ -8,6 +8,8 @@ class Admin < ApplicationRecord
   has_many :reviewed_applications, class_name: "VisaLetterApplication", foreign_key: :reviewed_by_id, dependent: :nullify
   has_many :activity_logs, dependent: :nullify
   has_many :event_notification_preferences, dependent: :destroy
+  has_many :api_keys, dependent: :destroy
+  has_many :created_api_keys, class_name: "ApiKey", foreign_key: :created_by_id, dependent: :destroy
 
   validates :first_name, presence: true, length: { maximum: 100 }
   validates :last_name, presence: true, length: { maximum: 100 }
