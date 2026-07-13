@@ -17,7 +17,7 @@ default_template_body = <<~TEMPLATE
   Participant Information:
   Full Name: {{participant_full_name}}
   Date of Birth: {{participant_date_of_birth}}
-  Country of Birth: {{participant_country_of_birth}}
+  Country of Citizenship: {{participant_country_of_birth}}
   Email: {{participant_email}}
   Phone: {{participant_phone_number}}
   Address: {{participant_address}}
