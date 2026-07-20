@@ -57,52 +57,56 @@ class VisaLetterApplicationsController < ApplicationController
       end
     end
 
-    @participant = existing_participant || Participant.new
-    @participant.assign_attributes(participant_params)
+    if existing_participant && !@invitation
+      create_for_existing_participant(existing_participant)
+    else
+      @participant = existing_participant || Participant.new
+      @participant.assign_attributes(participant_params)
 
-    if @participant.save
-      @application = @participant.visa_letter_applications.build(event: @event)
+      if @participant.save
+        @application = @participant.visa_letter_applications.build(event: @event)
 
-      if @application.save
-        @invitation&.claim!(@application)
+        if @application.save
+          @invitation&.claim!(@application)
 
-        if @invitation
-          # Skip email verification for manual invitations — the admin already
-          # verified the recipient when creating the invitation.
-          @participant.update!(email_verified_at: Time.current)
-          @application.mark_as_submitted!
+          if @invitation
+            # Skip email verification for manual invitations — the admin already
+            # verified the recipient when creating the invitation.
+            @participant.update!(email_verified_at: Time.current)
+            @application.mark_as_submitted!
 
-          ActivityLog.log!(
-            trackable: @application,
-            action: "application_created",
-            metadata: { event_id: @event.id, participant_email: @participant.email,
-                        manual_invitation_id: @invitation.id, email_verification_skipped: true },
-            request: request
-          )
+            ActivityLog.log!(
+              trackable: @application,
+              action: "application_created",
+              metadata: { event_id: @event.id, participant_email: @participant.email,
+                          manual_invitation_id: @invitation.id, email_verification_skipped: true },
+              request: request
+            )
 
-          ApplicationMailer.application_submitted(@application).deliver_later
-          AdminMailer.new_application_notification(@application).deliver_later
+            ApplicationMailer.application_submitted(@application).deliver_later
+            AdminMailer.new_application_notification(@application).deliver_later
 
-          redirect_to visa_letter_application_path(@application),
-                      notice: "Your application has been submitted!"
+            redirect_to visa_letter_application_path(@application),
+                        notice: "Your application has been submitted!"
+          else
+            @participant.generate_verification_code!
+            SendVerificationEmailJob.perform_later(@participant.id)
+
+            ActivityLog.log!(
+              trackable: @application,
+              action: "application_created",
+              metadata: { event_id: @event.id, participant_email: @participant.email },
+              request: request
+            )
+
+            redirect_to verify_email_visa_letter_application_path(@application)
+          end
         else
-          @participant.generate_verification_code!
-          SendVerificationEmailJob.perform_later(@participant.id)
-
-          ActivityLog.log!(
-            trackable: @application,
-            action: "application_created",
-            metadata: { event_id: @event.id, participant_email: @participant.email },
-            request: request
-          )
-
-          redirect_to verify_email_visa_letter_application_path(@application)
+          render :new, status: :unprocessable_entity
         end
       else
         render :new, status: :unprocessable_entity
       end
-    else
-      render :new, status: :unprocessable_entity
     end
   end
 
@@ -127,6 +131,9 @@ class VisaLetterApplicationsController < ApplicationController
     end
 
     if @participant.verify_code!(params[:verification_code])
+      # Ownership of the email is now proven, so it is safe to write the
+      # submitted PII onto the (possibly pre-existing) participant record.
+      @application.apply_pending_participant_attributes!
       @application.mark_as_submitted!
 
       ActivityLog.log!(
@@ -215,6 +222,47 @@ class VisaLetterApplicationsController < ApplicationController
   end
 
   private
+
+  # Public (non-invitation) submission whose email already belongs to a
+  # participant. We must NOT overwrite the shared participant's PII before the
+  # requester proves ownership of the email, so the submitted attributes are
+  # held on the pending application and applied only after verification.
+  def create_for_existing_participant(participant)
+    @participant = participant
+    pending = participant_params.to_h.except("email")
+
+    # Validate the submitted data without persisting it to the participant, so
+    # the form still surfaces errors up front.
+    candidate = @participant.dup
+    candidate.assign_attributes(pending)
+    unless candidate.valid?
+      @participant = candidate
+      render :new, status: :unprocessable_entity
+      return
+    end
+
+    @application = @participant.visa_letter_applications.build(
+      event: @event,
+      pending_participant_attributes: pending
+    )
+
+    if @application.save
+      @participant.generate_verification_code!
+      SendVerificationEmailJob.perform_later(@participant.id)
+
+      ActivityLog.log!(
+        trackable: @application,
+        action: "application_created",
+        metadata: { event_id: @event.id, participant_email: @participant.email },
+        request: request
+      )
+
+      redirect_to verify_email_visa_letter_application_path(@application)
+    else
+      @participant = candidate
+      render :new, status: :unprocessable_entity
+    end
+  end
 
   def set_event
     @event = Event.find_by!(slug: params[:event_slug])
