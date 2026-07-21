@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_13_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_20_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -69,6 +69,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000000) do
     t.datetime "last_sign_in_at"
     t.string "last_sign_in_ip"
     t.datetime "locked_at"
+    t.boolean "notify_all_events", default: false, null: false
     t.boolean "notify_new_applications", default: true, null: false
     t.string "provider"
     t.datetime "remember_created_at"
@@ -201,6 +202,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_000000) do
     t.datetime "letter_generated_at"
     t.datetime "letter_sent_at"
     t.uuid "participant_id", null: false
+    t.jsonb "pending_participant_attributes"
     t.string "reference_number", null: false
     t.text "rejection_reason"
     t.string "rejection_type"

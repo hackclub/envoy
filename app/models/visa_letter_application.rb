@@ -15,6 +15,12 @@ class VisaLetterApplication < ApplicationRecord
 
   REJECTION_TYPES = %w[soft hard].freeze
 
+  # PII fields that may be held on a pending application and applied to the
+  # participant only after email ownership is verified.
+  PENDING_PARTICIPANT_ATTRIBUTE_KEYS = %w[
+    full_name date_of_birth place_of_birth country_of_birth phone_number full_street_address
+  ].freeze
+
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :reference_number, presence: true, uniqueness: true
   validates :rejection_reason, presence: true, if: -> { status == "rejected" }
@@ -125,6 +131,22 @@ class VisaLetterApplication < ApplicationRecord
 
   def can_be_approved?
     pending_approval?
+  end
+
+  # Applies the PII submitted at application time to the shared participant
+  # record. Only called after the requester has proven ownership of the email,
+  # so an existing participant's data is never overwritten by an unverified
+  # submission. Re-slices to the allowed keys as defense-in-depth.
+  def apply_pending_participant_attributes!
+    return if pending_participant_attributes.blank?
+
+    attrs = pending_participant_attributes.slice(*PENDING_PARTICIPANT_ATTRIBUTE_KEYS)
+    return if attrs.blank?
+
+    transaction do
+      participant.update!(attrs)
+      update!(pending_participant_attributes: nil)
+    end
   end
 
   def can_be_rejected?
